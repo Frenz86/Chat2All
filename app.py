@@ -125,7 +125,7 @@ def main():
 
     # --- Page Config ---
     st.set_page_config(
-        page_title="The OmniChat",
+        page_title="Chat2All",
         page_icon="🤖",
         layout="centered",
         initial_sidebar_state="expanded",
