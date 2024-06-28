@@ -8,6 +8,7 @@ import base64
 from io import BytesIO
 import google.generativeai as genai
 import random
+import io
 
 load_dotenv()
 
@@ -106,23 +107,17 @@ def get_image_base64(image_raw):
     buffered = BytesIO()
     image_raw.save(buffered, format=image_raw.format)
     img_byte = buffered.getvalue()
-
     return base64.b64encode(img_byte).decode('utf-8')
 
 def file_to_base64(file):
     with open(file, "rb") as f:
-
         return base64.b64encode(f.read())
 
 def base64_to_image(base64_string):
     base64_string = base64_string.split(",")[1]
-    
     return Image.open(BytesIO(base64.b64decode(base64_string)))
 
-
-
 def main():
-
     # --- Page Config ---
     st.set_page_config(
         page_title="Chat2All",
@@ -344,20 +339,17 @@ def main():
 
             # --- Added Audio Response (optional) ---
             if audio_response:
-                response =  client.audio.speech.create(
+                response = client.audio.speech.create(
                     model=tts_model,
                     voice=tts_voice,
                     input=st.session_state.messages[-1]["content"][0]["text"],
                 )
-                audio_base64 = base64.b64encode(response.content).decode('utf-8')
-                audio_html = f"""
-                <audio controls autoplay>
-                    <source src="data:audio/wav;base64,{audio_base64}" type="audio/mp3">
-                </audio>
-                """
-                #st.markdown(audio_html)
-
-
+                
+                # Save the audio to a BytesIO object
+                audio_bytes = io.BytesIO(response.content)
+                
+                # Use Streamlit's audio function to play the audio
+                st.audio(audio_bytes, format='audio/wav')
 
 if __name__=="__main__":
     main()
